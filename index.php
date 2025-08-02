@@ -1,12 +1,16 @@
 <?php
 require 'vendor/autoload.php';
 
+// Load environment variables
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
 use App\controllers\AuthController;
 use App\controllers\PasswordController;
 
 // CORS headers
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 header('Content-Type: application/json');
 
@@ -37,6 +41,10 @@ try {
         PasswordController::list();
     } elseif (preg_match('/\/passwords\/(\d+)/', $uri, $matches) && $method === 'DELETE') {
         PasswordController::delete($matches[1]);
+    } elseif (preg_match('/\/passwords\/(\d+)/', $uri, $matches) && $method === 'PUT') {
+        PasswordController::update($matches[1], $body);
+    } elseif ($uri === '/generate-password' && $method === 'POST') {
+        PasswordController::generate($body);
     } else {
         http_response_code(404);
         echo json_encode(['error' => 'Endpoint not found']);

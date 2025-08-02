@@ -34,4 +34,12 @@ class Password {
         $stmt = $db->prepare("DELETE FROM passwords WHERE id = ? AND user_id = ?");
         return $stmt->execute([$id, $user_id]);
     }
+
+    public static function update(int $id, int $user_id, string $site, string $username, string $password): bool {
+        $db = Database::connect();
+        $encPass = Crypto::encrypt($password);
+        
+        $stmt = $db->prepare("UPDATE passwords SET site = ?, username = ?, password = ? WHERE id = ? AND user_id = ?");
+        return $stmt->execute([$site, $username, $encPass, $id, $user_id]);
+    }
 }
